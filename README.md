@@ -57,7 +57,7 @@ public class MainActivity extends FlutterActivity {
 
 ## 구현 화면
 
-<img src="./batterLevel.png">
+<img src="./battery_condition.png">
 
 
 ##TIL
