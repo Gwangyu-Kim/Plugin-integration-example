@@ -1,71 +1,58 @@
-import 'package:async/async.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+
+main() => runApp(MaterialApp(home: PlatformChannel()));
+
+class PlatformChannel extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+  _PlatformChannelState createState() => _PlatformChannelState();
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+class _PlatformChannelState extends State<PlatformChannel> {
+  static const platform = const MethodChannel('com.example.batterylevel/battery');
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+  String _batteryLevel = 'get Battery level';
 
-class _MyHomePageState extends State<MyHomePage> {
-  static const platform = const MethodChannel('com.example.batterylevel/battery');    //host의 MethodChannel명과 일치해야함.
 
-  //Get battery level.
-  String _batterLevel = "unkown";
-  Future<void> _getBatteryLevel() async{
-    String batteryLevel ;
-    try {
-      final int result = await platform.invokeMethod('getBatteryLevel');
-      print(batteryLevel);
-      print(result);
-      batteryLevel = 'Battery level at $result % .';
-    } on PlatformException catch (e){
-      batteryLevel = "Fail to get Battery level: '${e.message}'";
-    }
-
-    setState(() {
-      _batterLevel = batteryLevel;
-    });
-
-  }
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Center(
+    return Scaffold(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             RaisedButton(
-              child: Text("Get Battery Level"),
-              onPressed: _getBatteryLevel,
+              child: Text('Get Battery Level'),
+              onPressed: _getBatterLevel,
             ),
-            Text(_batterLevel),
+            Text(_batteryLevel)
           ],
         ),
       ),
     );
-
   }
 
+  Future<void> _getBatterLevel() async {
+    print('1111');
+    String batteryLevel;
+    try {
+      final int result = await platform.invokeMethod('getBatteryLevel');
+      batteryLevel = 'battery level is $result%';
+      print(batteryLevel);
+    } on PlatformException catch (e) {
+      batteryLevel = "Can't reach at battery level.  ... ${e.message}";
+    }
 
+
+    setState(() {
+      _batteryLevel = batteryLevel;
+    });
+  }
 }
+
+
 
